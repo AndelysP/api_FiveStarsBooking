@@ -1,4 +1,5 @@
 const ShipController = require("../controllers/ship");
+const UserController = require("../controllers/user");
 const nodemailer = require("nodemailer");
 
 module.exports = server => {
@@ -8,6 +9,18 @@ module.exports = server => {
 
     server.get("/ships/:id", (req, res) => {
         ShipController.get(req, res);
+    });
+
+    server.get("/users", (req, res) => {
+        UserController.getAll(req, res);
+    });
+
+    server.get("/users/:id", (req, res) => {
+        UserController.get(req, res);
+    });
+
+    server.post("/users", (req, res) => {
+        UserController.create(req, res);
     });
 
     server.post('/contact', function (req, res) {
@@ -52,7 +65,7 @@ module.exports = server => {
         transporter.sendMail(mailOptions, function (error, info) {
             if (error) {
                 console.log(error);
-                res.status(500).send('Erreur lors de l\'envoie du message');
+                res.status(500).send('Erreur lors de l\'envoi du message');
             } else {
                 console.log('Email sent: ' + info.response);
                 res.status(200).send('Message envoyé avec succès');
