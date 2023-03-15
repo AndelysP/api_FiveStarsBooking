@@ -1,4 +1,5 @@
 const User = require("../models/user");
+const bcrypt = require('bcrypt');
 
 module.exports = {
     getAll(req, res) {
@@ -13,14 +14,18 @@ module.exports = {
         });
     },
     create(req, res) {
-        const user = new User({
-            userfirstname: req.body.userfirstname,
-            userlastname: req.body.userlastname,
-            email: req.body.email,
-            password: req.body.password
-        });
-        user.save().then(() => {
-            res.send({ result: `Création de l'utilisateur' ${user.firstname} ${user.lastname}` });
+        const { userfirstname, userlastname, email, password } = req.body
+        bcrypt.hash(password, 10).then(hashPassword => {
+            const user = new User({
+                userfirstname: userfirstname,
+                userlastname: userlastname,
+                email: email,
+                password: hashPassword
+            });
+
+            user.save().then(() => {
+                res.send({ result: `Création de l'utilisateur' ${user.firstname} ${user.lastname}` });
+            });
         });
     }
 }
