@@ -14,18 +14,29 @@ module.exports = {
         });
     },
     create(req, res) {
-        const { userfirstname, userlastname, email, password } = req.body
-        bcrypt.hash(password, 10).then(hashPassword => {
-            const user = new User({
-                userfirstname: userfirstname,
-                userlastname: userlastname,
-                email: email,
-                password: hashPassword
-            });
+        const { userfirstname, userlastname, email, password } = req.body;
 
-            user.save().then(() => {
-                res.send({ result: `Création de l'utilisateur' ${user.firstname} ${user.lastname}` });
-            });
-        });
+        // Vérifier si l'email existe déjà dans la base de données
+        User.findOne({ email: email }).then(existingUser => {
+            if (existingUser) {
+                // Si un utilisateur avec cet email existe déjà, renvoyer une réponse d'erreur
+                return res.status(400).send({ error: 'Un utilisateur avec cet email existe déjà.' });
+
+            } else {
+                // Si l'email n'existe pas encore, continuer avec la création de l'utilisateur
+                bcrypt.hash(password, 10).then(hashPassword => {
+                    const user = new User({
+                        userfirstname: userfirstname,
+                        userlastname: userlastname,
+                        email: email,
+                        password: hashPassword
+                    });
+    
+                    user.save().then(() => {
+                        res.send({ result: `Création de l'utilisateur ${user.firstname} ${user.lastname}` });
+                    });
+                });
+            }
+        });  
     }
 }
