@@ -1,6 +1,7 @@
 const User = require("../models/user");
 const bcrypt = require('bcrypt');
 const nodemailer = require("nodemailer");
+const jwt = require("jsonwebtoken");
 
 module.exports = {
     getAll(req, res) {
@@ -39,18 +40,25 @@ module.exports = {
                         res.send({ result: `Création de l'utilisateur ${user.firstname} ${user.lastname}` })
                     })
                 });
-                
+
             }
         })
     },
 
     forgetPassword(req, res) {
+
+        const { email } = req.body;
+
+        const secretKey = 'kM4vQ4Dn9AZ7F3Jp8KtRcSg6Ew2YhBxN';
+        const token = jwt.sign({ email: email }, secretKey, { expiresIn: '1h' });
+        const resetUrl = `http://localhost:3000/reset/${token}`;
+
         const transporter = nodemailer.createTransport({
             host: "sandbox.smtp.mailtrap.io",
             port: 2525,
             auth: {
-                user: "ed743c759844c1",
-                pass: "aaa2330573bfed"
+                user: "71aabcd5b8c023",
+                pass: "95afd679f77e28"
             }
         });
 
@@ -72,8 +80,7 @@ module.exports = {
                   Five Star's Booking
                 </p>
                 <div style="font-size: .8rem; margin: 0 30px">
-                  <p>Mr/Mme, voici un lien pour réinitialiser votre mdp</p>
-                  <p>E-mail: <b>${req.body.email}</b></p>
+                <p>Bonjour,\n\nCliquez sur le lien suivant pour réinitialiser votre mot de passe : <a href="${resetUrl}">Réinitialisez votre mot de passe</a><br/>Le lien expire dans 1h<br/>Cordialement,<br/>L'équipe de support</p>
                 </div>
                 </div>
                 </div>
@@ -92,13 +99,17 @@ module.exports = {
         });
     },
 
+    resetPassword(req, res) {
+       
+    },
+
     contact(req, res) {
         const transporter = nodemailer.createTransport({
             host: "sandbox.smtp.mailtrap.io",
             port: 2525,
             auth: {
-                user: "ed743c759844c1",
-                pass: "aaa2330573bfed"
+                user: "71aabcd5b8c023",
+                pass: "95afd679f77e28"
             }
         });
 
@@ -140,5 +151,7 @@ module.exports = {
                 res.status(200).send('Message envoyé avec succès');
             }
         });
-    }
+    },
+
+
 }

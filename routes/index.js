@@ -1,6 +1,5 @@
 const ShipController = require("../controllers/ship");
 const UserController = require("../controllers/user");
-const nodemailer = require("nodemailer");
 
 module.exports = server => {
     server.get("/ships", (req, res) => {
@@ -27,14 +26,11 @@ module.exports = server => {
         UserController.contact(req, res);
     });
 
-    server.post('/resetPassword', function (req, res) {
+    server.post('/forgetPassword', function (req, res) {
         UserController.forgetPassword(req, res);
-    })
-    // server.post("/ships", (req, res) => {
-    //     ShipController.create(req, res);
-    // });
+    });
 
-    // server.delete("/ships/:id", (req, res) => {
-    //     ShipController.delete(req, res);
-    // })
+    server.post("/resetPassword", (req, res) => {
+        UserController.resetPassword(req, res);
+    });
 }
