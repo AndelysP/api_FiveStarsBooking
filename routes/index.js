@@ -1,5 +1,6 @@
 const ShipController = require("../controllers/ship");
 const UserController = require("../controllers/user");
+const auth = require('../middleware/auth');
 
 module.exports = server => {
     server.get("/ships", (req, res) => {
@@ -20,6 +21,11 @@ module.exports = server => {
 
     server.post("/users", (req, res) => {
         UserController.create(req, res);
+    });
+
+    server.post("/login", (req, res) => {
+        UserController.login(req, res), 
+        auth
     });
 
     server.post('/contact', function (req, res) {
