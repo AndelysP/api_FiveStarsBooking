@@ -1,5 +1,7 @@
 const User = require("../models/user");
 const bcrypt = require('bcrypt');
+const multer = require('multer')
+const upload = multer({ dest: 'uploads/' })
 
 module.exports = {
     getAll(req, res) {
@@ -31,12 +33,21 @@ module.exports = {
                         email: email,
                         password: hashPassword
                     });
-    
+
                     user.save().then(() => {
                         res.send({ result: `Création de l'utilisateur ${user.firstname} ${user.lastname}` });
                     });
                 });
             }
-        });  
+        });
+    },
+
+    changeAvatar(req, res) {
+        const id = req.params.id;
+        User.findById(id).then(user => {
+            user.avatar = req.file.filename;
+            user.save();
+            res.send({ avatar: user.avatar });
+        });
     }
 }

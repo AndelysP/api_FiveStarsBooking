@@ -6,6 +6,7 @@ const cors = require('cors'); // chargement de cors
 
 server.use(cors());
 server.use(express.json());
+server.use('/uploads', express.static('uploads'));
 routes(server);
 
 server.listen(5500, () => {
