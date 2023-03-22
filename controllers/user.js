@@ -2,7 +2,7 @@ const User = require("../models/user");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const nodemailer = require("nodemailer");
-const jwt = require("jsonwebtoken");
+
 
 module.exports = {
     getAll(req, res) {
@@ -171,7 +171,7 @@ module.exports = {
                         token: jwt.sign(
                             { userId: user._id },
                             'RANDOM_TOKEN_SECRET',
-                            { expiresIn: '24h' }
+                            { expiresIn: 3600 }
                         )
                     });
                 })

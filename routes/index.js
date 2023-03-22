@@ -15,7 +15,7 @@ module.exports = server => {
         UserController.getAll(req, res);
     });
 
-    server.get("/users/:id", (req, res) => {
+    server.get("/users/:id", auth, (req, res) => {
         UserController.get(req, res);
     });
 
@@ -24,8 +24,7 @@ module.exports = server => {
     });
 
     server.post("/login", (req, res) => {
-        UserController.login(req, res), 
-        auth
+        UserController.login(req, res);
     });
 
     server.post('/contact', function (req, res) {
