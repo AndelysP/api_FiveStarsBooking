@@ -108,18 +108,13 @@ module.exports = {
                 return res.status(400).json({ message: "Utilisateur introuvable " });
             }
 
-            jwt.verify(token, secretKey, async (err, decodedToken) => {
-                if (err) {
-                    return res.status(401).json({ message: "Token invalide ou expiré" });
-                }
+            const hashedPassword = await bcrypt.hash(newPassword, 10);
+            user.password = hashedPassword;
 
-                const hashedPassword = await bcrypt.hash(newPassword, 10);
-                user.password = hashedPassword;
+            await user.save();
 
-                await user.save();
+            return res.status(200).json({ message: "Mot de passe réinitialisé avec succès" });
 
-                return res.status(200).json({ message: "Mot de passe réinitialisé avec succès" });
-            })
 
 
         } catch (err) {
