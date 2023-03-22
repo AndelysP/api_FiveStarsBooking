@@ -2,7 +2,6 @@ const User = require("../models/user");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const nodemailer = require("nodemailer");
-const jwt = require("jsonwebtoken");
 
 module.exports = {
     getAll(req, res) {
@@ -58,8 +57,8 @@ module.exports = {
             host: "sandbox.smtp.mailtrap.io",
             port: 2525,
             auth: {
-                user: "71aabcd5b8c023",
-                pass: "95afd679f77e28"
+                user: "ed743c759844c1",
+                pass: "aaa2330573bfed"
             }
         });
 
@@ -100,8 +99,33 @@ module.exports = {
         });
     },
 
-    resetPassword(req, res) {
-       
+    async resetPassword(req, res) {
+        const { email, newPassword, token } = req.body;
+
+        try {
+            const user = await User.findOne({ email });
+            if (!user) {
+                return res.status(400).json({ message: "Utilisateur introuvable " });
+            }
+
+            jwt.verify(token, secretKey, async (err, decodedToken) => {
+                if (err) {
+                    return res.status(401).json({ message: "Token invalide ou expiré" });
+                }
+
+                const hashedPassword = await bcrypt.hash(newPassword, 10);
+                user.password = hashedPassword;
+
+                await user.save();
+
+                return res.status(200).json({ message: "Mot de passe réinitialisé avec succès" });
+            })
+
+
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json({ message: "Erreur lors de la réinitialisation du mot de passe" });
+        }
     },
 
     contact(req, res) {
@@ -109,8 +133,8 @@ module.exports = {
             host: "sandbox.smtp.mailtrap.io",
             port: 2525,
             auth: {
-                user: "71aabcd5b8c023",
-                pass: "95afd679f77e28"
+                user: "ed743c759844c1",
+                pass: "aaa2330573bfed"
             }
         });
 
@@ -155,28 +179,28 @@ module.exports = {
     },
 
     //fonction login
-    login(req, res){
+    login(req, res) {
         User.findOne({ email: req.body.email })
-        .then(user => {
-            if (!user) {
-                return res.status(401).json({ message: 'login/mot de passe incorrect'});
-            }
-            bcrypt.compare(req.body.password, user.password)
-                .then(valid => {
-                    if (!valid) {
-                        return res.status(401).json({ message: 'login/mot de passe incorrect' });
-                    }
-                    res.status(200).json({
-                        userId: user._id,
-                        token: jwt.sign(
-                            { userId: user._id },
-                            'RANDOM_TOKEN_SECRET',
-                            { expiresIn: '24h' }
-                        )
-                    });
-                })
-                .catch(error => res.status(500).json({ error }));
-        })
-        .catch(error => res.status(500).json({ error }));
+            .then(user => {
+                if (!user) {
+                    return res.status(401).json({ message: 'login/mot de passe incorrect' });
+                }
+                bcrypt.compare(req.body.password, user.password)
+                    .then(valid => {
+                        if (!valid) {
+                            return res.status(401).json({ message: 'login/mot de passe incorrect' });
+                        }
+                        res.status(200).json({
+                            userId: user._id,
+                            token: jwt.sign(
+                                { userId: user._id },
+                                'RANDOM_TOKEN_SECRET',
+                                { expiresIn: '24h' }
+                            )
+                        });
+                    })
+                    .catch(error => res.status(500).json({ error }));
+            })
+            .catch(error => res.status(500).json({ error }));
     }
 }
