@@ -3,6 +3,7 @@ const server = express(); // création du serveur
 const mongoose = require("mongoose") // chargement de mongoDB 
 const routes = require("./routes"); // chargement des routes
 const cors = require('cors'); // chargement de cors 
+require('dotenv').config()
 
 server.use(cors());
 server.use(express.json());

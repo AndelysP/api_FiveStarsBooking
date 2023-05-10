@@ -51,19 +51,19 @@ module.exports = {
 
         const { email } = req.body;
 
-        const secretKey = 'kM4vQ4Dn9AZ7F3Jp8KtRcSg6Ew2YhBxN';
+        const secretKey = process.env.SECRET_KEY;
         const token = jwt.sign({ email: email }, secretKey, { expiresIn: '1h' });
         const resetUrl = `http://localhost:3000/reset/${token}`;
 
         const transporter = nodemailer.createTransport({
-            host: "sandbox.smtp.mailtrap.io",
+            host: process.env.URL_HOST,
             port: 2525,
             auth: {
-                user: "ed743c759844c1",
-                pass: "aaa2330573bfed"
+                user: process.env.MAIL_USER,
+                pass: process.env.MAIL_PASS
             }
         });
-
+        
         const mailOptions = {
             from: 'contact@5starsbooking.com',
             to: `${req.body.email}`,
@@ -102,7 +102,7 @@ module.exports = {
     },
 
     async resetPassword(req, res) {
-        const { email, newPassword, token } = req.body;
+        const { email, newPassword } = req.body;
 
         try {
             const user = await User.findOne({ email });
@@ -127,11 +127,11 @@ module.exports = {
 
     contact(req, res) {
         const transporter = nodemailer.createTransport({
-            host: "sandbox.smtp.mailtrap.io",
+            host: process.env.URL_HOST,
             port: 2525,
             auth: {
-                user: "ed743c759844c1",
-                pass: "aaa2330573bfed"
+                user: process.env.MAIL_USER,
+                pass: process.env.MAIL_PASS
             }
         });
 
@@ -187,28 +187,28 @@ module.exports = {
 
     //fonction login
     login(req, res) {
-    User.findOne({ email: req.body.email })
-        .then(user => {
-            if (!user) {
-                return res.status(401).json({ message: 'login/mot de passe incorrect' });
-            }
-            bcrypt.compare(req.body.password, user.password)
-                .then(valid => {
-                    if (!valid) {
-                        return res.status(401).json({ message: 'login/mot de passe incorrect' });
-                    }
-                    res.status(200).json({
-                        userId: user._id,
-                        token: jwt.sign(
-                            { userId: user._id },
-                            'RANDOM_TOKEN_SECRET',
-                            { expiresIn: 3600 }
-                        )
-                    });
-                })
-                .catch(error => res.status(500).json({ error }));
-        })
-        .catch(error => res.status(500).json({ error }));
+        User.findOne({ email: req.body.email })
+            .then(user => {
+                if (!user) {
+                    return res.status(401).json({ message: 'login/mot de passe incorrect' });
+                }
+                bcrypt.compare(req.body.password, user.password)
+                    .then(valid => {
+                        if (!valid) {
+                            return res.status(401).json({ message: 'login/mot de passe incorrect' });
+                        }
+                        res.status(200).json({
+                            userId: user._id,
+                            token: jwt.sign(
+                                { userId: user._id },
+                                process.env.SECRET_KEY,
+                                {}
+                            ),
+                        });
+                    })
+                    .catch(error => res.status(500).json({ error }));
+            })
+            .catch(error => res.status(500).json({ error }));
     }
 }
 
